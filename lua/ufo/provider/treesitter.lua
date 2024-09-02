@@ -99,12 +99,18 @@ local function iterFoldMatches(bufnr, parser, root, rootLang)
         end
 
         -- Extract capture names from each match
-        for id, node in pairs(match) do
+        for id, nodes in pairs(match) do
             local m = metadata[id]
             if m and m.range then
-                node = MetaNode:new(m.range)
+                table.insert(matches, MetaNode:new(m.range))
+            elseif type(nodes) == 'table' then
+                for _, node in ipairs(nodes) do
+                    table.insert(matches, node)
+                end
+            else
+                -- for neovim v0.10.1 or before
+                table.insert(matches, node)
             end
-            table.insert(matches, node)
         end
 
         -- Add some predicates for testing
